@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Firework Message</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  overflow: hidden;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+}
+
+#message {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  font-size: 2.2rem;
+  font-family: "Arial", sans-serif;
+  color: white;
+  text-shadow: 0 0 20px gold, 0 0 40px red;
+  opacity: 0;
+  transition: opacity 2s;
+}
+
+#hint {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #aaa;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="message"></div>
+<div id="hint">🎵 Tap anywhere if music doesn’t start</div>
+
+<!-- Background music -->
+<audio id="bgMusic" loop>
+  <source src="https://your-username.github.io/your-repo/music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const message = document.getElementById("message");
+const music = document.getElementById("bgMusic");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.onresize = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+};
+
+// Firework particles
+class Particle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 6;
+    this.speedY = (Math.random() - 0.5) * 6;
+    this.life = 100;
+  }
+
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.life--;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+}
+
+let particles = [];
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+  const colors = ["red", "yellow", "orange", "pink", "cyan", "lime"];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  for (let i = 0; i < 60; i++) {
+    particles.push(new Particle(x, y, color));
+  }
+}
+
+function animate() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, index) => {
+    p.update();
+    p.draw();
+    if (p.life <= 0) particles.splice(index, 1);
+  });
+
+  requestAnimationFrame(animate);
+}
+
+setInterval(createFirework, 800);
+animate();
+
+// Message loop
+const messages = [
+  "🎉 Happy late birthday, Bontle! 🎂",
+  "✨ From Artwell ✨"
+];
+
+let index = 0;
+
+function showMessage() {
+  message.style.opacity = 0;
+
+  setTimeout(() => {
+    message.innerHTML = messages[index];
+    message.style.opacity = 1;
+    index = (index + 1) % messages.length;
+  }, 2000);
+}
+
+showMessage();
+setInterval(showMessage, 6000);
+
+/* -------- AUTOPLAY MUSIC -------- */
+window.addEventListener("load", () => {
+  music.play().catch(() => {});
+});
+
+// Click fallback for mobile devices
+document.body.addEventListener("click", () => {
+  music.play().catch(() => {});
+});
+</script>
+
+</body>
+  </html>
